@@ -74,7 +74,7 @@ public class MainActivity extends Activity {
         updateLocPolling();
     }
 
-    private void updateLocPolling() {
+    private void updateLocPolling() throws SecurityException {
         if (getBatt() > LOW_BATT_THRESHOLD / 100) {
             locationManager.removeUpdates(locationListener);
             if (interval < LOWER_INTERVAL_BOUND) interval = DEFAULT_INTERVAL;
