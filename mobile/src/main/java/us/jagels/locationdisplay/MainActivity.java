@@ -24,11 +24,11 @@ import java.util.Date;
 import static java.text.DateFormat.getDateTimeInstance;
 
 public class MainActivity extends Activity {
-    private int DEFAULT_INTERVAL = 5;
-    private int SHAKE_REDUCE = 1;
-    private int LOWER_INTERVAL_BOUND = 1;
-    private int LOW_BATT_THRESHOLD = 50;
-    private int LOW_BATT_OFFSET = 10;
+    private final int DEFAULT_INTERVAL = 5;
+    private final int SHAKE_REDUCE = 1;
+    private final int LOWER_INTERVAL_BOUND = 1;
+    private final int LOW_BATT_THRESHOLD = 50;
+    private final int LOW_BATT_OFFSET = 10;
     private int interval;
 
 
@@ -56,9 +56,7 @@ public class MainActivity extends Activity {
                     debounce = se.timestamp;
                     decLocPolling();
                     updateLocPolling();
-                    Toast toast = Toast.makeText(getApplicationContext(),
-                            "Shake it like a Polariod picture! " + Integer.toString(interval), Toast.LENGTH_SHORT);
-                    toast.show();
+
                 }
             }
         }
@@ -75,17 +73,20 @@ public class MainActivity extends Activity {
     }
 
     private void updateLocPolling() throws SecurityException {
-        if (getBatt() > LOW_BATT_THRESHOLD / 100) {
-            locationManager.removeUpdates(locationListener);
-            if (interval < LOWER_INTERVAL_BOUND) interval = DEFAULT_INTERVAL;
+        locationManager.removeUpdates(locationListener);
+        if (interval < LOWER_INTERVAL_BOUND) interval = DEFAULT_INTERVAL;
+        if (getBatt() > (float)LOW_BATT_THRESHOLD / 100) {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                     interval * 1000, 0, locationListener);
+            Toast toast = Toast.makeText(getApplicationContext(),
+                    "Refresh every " + Integer.toString(interval), Toast.LENGTH_SHORT);
+            toast.show();
         } else {
-            locationManager.removeUpdates(locationListener);
-            if (interval < LOWER_INTERVAL_BOUND + LOW_BATT_OFFSET)
-                interval = DEFAULT_INTERVAL + LOW_BATT_OFFSET;
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                    interval * 1000, 0, locationListener);
+                    (interval + LOW_BATT_OFFSET) * 1000, 0, locationListener);
+            Toast toast = Toast.makeText(getApplicationContext(),
+                    "Refresh every " + Integer.toString(interval + LOW_BATT_OFFSET), Toast.LENGTH_SHORT);
+            toast.show();
         }
     }
 
@@ -122,7 +123,7 @@ public class MainActivity extends Activity {
         };
 
         // Gimme location pls
-        while (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, interval * 1000, 0, locationListener);
