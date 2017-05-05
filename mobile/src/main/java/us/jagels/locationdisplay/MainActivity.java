@@ -1,11 +1,9 @@
 package us.jagels.locationdisplay;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -15,7 +13,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.BatteryManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -122,11 +119,7 @@ public class MainActivity extends Activity {
             }
         };
 
-        // Gimme location pls
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-        }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, interval * 1000, 0, locationListener);
+        updateLocPolling();
     }
 
     protected void setstr(Location location) {
